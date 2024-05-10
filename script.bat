@@ -16,9 +16,9 @@
 
 @REM @echo Done
 mkdir "temp"
-set temp="D:/Mes documents/Romance/Desktop/fianarana/spring web/sprint/FrameWork/temp"
-set jar="D:/Mes documents/Romance/Desktop/fianarana/spring web/sprint/FrameWork/lib/*"
-set javaako="D:\Mes documents\Romance\Desktop\fianarana\spring web\sprint\FrameWork\src\"
+set temp="D:\NainaFrameWork\FrameWorks\temp"
+set jar="D:\NainaFrameWork\FrameWorks\lib/*"
+set javaako="D:\NainaFrameWork\FrameWorks\src\"
 
 @REM Compilation des fichiers dans le répertoire src et ses sous-répertoires
 for /r ".\src" %%f in (*.java) do (
@@ -32,7 +32,7 @@ javac -cp %jar% -d "../temp" *.java
  )
 cd .. 
 
-set libTest="D:/Mes documents/Romance/Desktop/fianarana/spring web/sprint/Test/lib"
+set libTest="D:\NainaFrameWork\Test\lib"
 
 jar cvf "sprint0.jar" -C temp/ .
 move "sprint0.jar" %libTest%
