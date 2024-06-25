@@ -1,15 +1,16 @@
-package controller;
+package Controller;
 
-import annotation.Get;
-import modele.Mapping;
-import modele.ListClass;
-import modele.ModelView;
+import Annotation.Get;
+import Fonction.Mapping;
+import Fonction.ListClasse;
+import Fonction.ModelView;
 
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.InvocationTargetException;
 
 import jakarta.servlet.ServletException;
@@ -39,7 +40,7 @@ public class FrontController extends HttpServlet {
             throw new ServletException("Le paramètre 'Package_Controller' est manquant ou vide");
         }
         try {
-            this.setControllers(ListClass.getAllClasses(packageName));
+            this.setControllers(ListClasse.getAllClasses(packageName));
 
             // itérer les contrôleurs et récupérer les méthodes annotées par @Get
             for (Class<?> controller : this.getControllers()) {
@@ -99,11 +100,31 @@ public class FrontController extends HttpServlet {
             Object controllerInstance = controllerClass.newInstance();
             
             // Récupération de la méthode
-            Method method = controllerClass.getMethod(methodName);
+            Method method = null;
+            for(Method m : controllerClass.getMethods()) {
+                if(m.getName().equals(methodName)) {
+                    method = m;
+                    break;
+                }
+            }
+            if(method == null) {
+                throw new NoSuchMethodException(controllerClass.getName() + "." + methodName + "()");
+            }
             
             // Exécution de la méthode et récupération du résultat
-            Object result = method.invoke(controllerInstance);
-            
+            Object result;
+            Parameter[] parameters = method.getParameters();
+            if(parameters.length > 0) {
+                ArrayList<Object> values = ListClasse.parameterMethod(method, req);
+                if(values.size() != parameters.length) {
+                    throw new IllegalArgumentException("Nombre d'arguments incorrect pour la méthode " + method);
+                }
+                result = method.invoke(controllerInstance, values.toArray());
+            }
+            else {
+                result = method.invoke(controllerInstance);
+            }
+        
             if(result instanceof ModelView) {
                 ModelView modelView = (ModelView)result;
                 String urlView = modelView.getUrl();
@@ -123,8 +144,7 @@ public class FrontController extends HttpServlet {
                 out.println("<p>Résultat : " + result.toString() + "</p>");
             }
             else {
-                resp.setContentType("text/html");
-                out.println("<p>Non reconnu</p><br>");
+                throw new ServletException("Le type de retour de la méthode est invalide");
             }
         }
         catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
