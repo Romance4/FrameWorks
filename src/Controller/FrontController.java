@@ -1,7 +1,9 @@
 package Controller;
 
+
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ ArrayList<Class<?>> controllers;
     
         try {
             this.setControllers(ListClasse.getAllClasses(packageName));
+
     
             for (Class<?> controller : this.getControllers()) {
                 for (Method method : controller.getDeclaredMethods()) {
@@ -94,14 +97,17 @@ ArrayList<Class<?>> controllers;
         String methodName = mapping.getMethodName();
         try {
             Class<?> controllerClass = Class.forName(controllerName);
+
             Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
             Method method = null;
             for (Method m : controllerClass.getMethods()) {
                 if (m.getName().equals(methodName)) {
+
                     method = m;
                     break;
                 }
             }
+
             if (method == null) {
                 throw new NoSuchMethodException(controllerClass.getName() + "." + methodName + "()");
             }
@@ -122,6 +128,7 @@ ArrayList<Class<?>> controllers;
                 ArrayList<Object> parameterValues = ListClasse.getParameterValuesCombined(method, req);
                 if (parameterValues.size() != method.getParameterCount()) {
                     throw new IllegalArgumentException("Nombre d'argument incorrect pour la methode" + method);
+
                 }
                 result = method.invoke(controllerInstance,parameterValues.toArray());
             }else{
@@ -145,7 +152,9 @@ ArrayList<Class<?>> controllers;
             } else {
                 throw new ServletException("Le type de retour de la méthode est invalide");
             }
+
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+
             throw new ServletException("Erreur lors de l'exécution de la méthode", e);
         }
     }
