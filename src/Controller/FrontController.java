@@ -152,10 +152,11 @@ ArrayList<Class<?>> controllers;
             } else {
                 throw new ServletException("Le type de retour de la méthode est invalide");
             }
-
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
 
             throw new ServletException("Erreur lors de l'exécution de la méthode", e);
+        }catch (Exception e){
+            out.println(e.getLocalizedMessage());
         }
     }
     

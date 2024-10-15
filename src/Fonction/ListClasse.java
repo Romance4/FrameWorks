@@ -20,6 +20,7 @@ import com.thoughtworks.paranamer.Paranamer;
 import Annotation.Parametre;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 public class ListClasse {
     public static ArrayList<Class<?>> getAllClasses(String packageName) throws ClassNotFoundException, IOException {
@@ -62,7 +63,6 @@ public class ListClasse {
 
         return result;
     }
-
     // Argument de type non objet
     public static ArrayList<Object> ParameterMethod(Method method, HttpServletRequest request) throws Exception {
 
@@ -157,7 +157,9 @@ public class ListClasse {
         } else {
             return value;
         }
-    }   
+
+    }
+
     
     public static ArrayList<Object> getParameterValuesForMethod(Method method, HttpServletRequest request) throws Exception {
         ArrayList<Object> parameterValues = new ArrayList<>();
@@ -184,8 +186,14 @@ public class ListClasse {
             int index = i;
             Parameter param = parameters[i];
             Class<?> paramType = param.getType();
+
+            if (paramType == MySession.class) {
+            HttpSession session = request.getSession();
+            MySession mySession = new MySession(session);
+            parameterValues.add(mySession);
     
-            if (!paramType.isPrimitive() && paramType != String.class) {
+            }else if (!paramType.isPrimitive() && paramType != String.class) {
+
                 Object paramObject = paramType.newInstance();
     
                 Map<String, String[]> parameterMap = request.getParameterMap().entrySet().stream()
@@ -225,7 +233,9 @@ public class ListClasse {
                         }
                     }
                     if (!found) {
-                        value ="null";
+
+                        throw new Exception("ETU2465 : tsisy annotation");
+
                     }
                 }
                 if (value == null) {
