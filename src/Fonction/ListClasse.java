@@ -1,6 +1,5 @@
 package Fonction;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -18,8 +17,8 @@ import com.thoughtworks.paranamer.AdaptiveParanamer;
 import com.thoughtworks.paranamer.Paranamer;
 
 import Annotation.Parametre;
-
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 public class ListClasse {
     public static ArrayList<Class<?>> getAllClasses(String packageName) throws ClassNotFoundException, IOException {
@@ -62,10 +61,8 @@ public class ListClasse {
 
         return result;
     }
-
     // Argument de type non objet
     public static ArrayList<Object> ParameterMethod(Method method, HttpServletRequest request) throws Exception {
-
         ArrayList<Object> parameterValues = new ArrayList<>();
         Paranamer paranamer = new AdaptiveParanamer();
         String[] parameterNamesArray = paranamer.lookupParameterNames(method, false);
@@ -73,12 +70,10 @@ public class ListClasse {
         // Récupérer les noms des paramètres de la méthode en utilisant la réflexion
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
-
             Parameter param = parameters[i];
             String value = null;
             if (param.isAnnotationPresent(Parametre.class)) {
                 Parametre argument = param.getAnnotation(Parametre.class);
-
                 String arg_name = argument.value();
                 value = request.getParameter(arg_name);
             } else {
@@ -97,7 +92,6 @@ public class ListClasse {
                 }
             }
             if (value == null) {
-
                 throw new IllegalArgumentException("Paramètre manquant ou invalide: " + param.getName());
             }
             parameterValues.add(value);
@@ -157,7 +151,7 @@ public class ListClasse {
         } else {
             return value;
         }
-    }   
+    }
     
     public static ArrayList<Object> getParameterValuesForMethod(Method method, HttpServletRequest request) throws Exception {
         ArrayList<Object> parameterValues = new ArrayList<>();
@@ -184,8 +178,13 @@ public class ListClasse {
             int index = i;
             Parameter param = parameters[i];
             Class<?> paramType = param.getType();
+
+            if (paramType == MySession.class) {
+            HttpSession session = request.getSession();
+            MySession mySession = new MySession(session);
+            parameterValues.add(mySession);
     
-            if (!paramType.isPrimitive() && paramType != String.class) {
+            }else if (!paramType.isPrimitive() && paramType != String.class) {
                 Object paramObject = paramType.newInstance();
     
                 Map<String, String[]> parameterMap = request.getParameterMap().entrySet().stream()
@@ -225,7 +224,7 @@ public class ListClasse {
                         }
                     }
                     if (!found) {
-                        value ="null";
+                        throw new Exception("ETU2465 : tsisy annotation");
                     }
                 }
                 if (value == null) {
@@ -234,7 +233,6 @@ public class ListClasse {
                 parameterValues.add(value);
             }
         }
-
         return parameterValues;
     }
 }
