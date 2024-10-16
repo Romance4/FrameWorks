@@ -1,15 +1,16 @@
 package Controller;
 
-
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.google.gson.Gson;
+
 import Annotation.Get;
+import Annotation.RestAPI;
 import Fonction.ListClasse;
 import Fonction.Mapping;
 import Fonction.ModelView;
@@ -41,7 +42,6 @@ ArrayList<Class<?>> controllers;
     
         try {
             this.setControllers(ListClasse.getAllClasses(packageName));
-
     
             for (Class<?> controller : this.getControllers()) {
                 for (Method method : controller.getDeclaredMethods()) {
@@ -97,17 +97,14 @@ ArrayList<Class<?>> controllers;
         String methodName = mapping.getMethodName();
         try {
             Class<?> controllerClass = Class.forName(controllerName);
-
             Object controllerInstance = controllerClass.getDeclaredConstructor().newInstance();
             Method method = null;
             for (Method m : controllerClass.getMethods()) {
                 if (m.getName().equals(methodName)) {
-
                     method = m;
                     break;
                 }
             }
-
             if (method == null) {
                 throw new NoSuchMethodException(controllerClass.getName() + "." + methodName + "()");
             }
@@ -128,12 +125,28 @@ ArrayList<Class<?>> controllers;
                 ArrayList<Object> parameterValues = ListClasse.getParameterValuesCombined(method, req);
                 if (parameterValues.size() != method.getParameterCount()) {
                     throw new IllegalArgumentException("Nombre d'argument incorrect pour la methode" + method);
-
                 }
                 result = method.invoke(controllerInstance,parameterValues.toArray());
             }else{
                 result = method.invoke(controllerInstance);
             }
+            boolean isRestApi = method.isAnnotationPresent(RestAPI.class);
+         if (isRestApi) {
+            // La méthode est annotée avec @RestApi, on traite le résultat en JSON
+            resp.setContentType("application/json");
+
+            if (result instanceof ModelView) {
+                // Transformer le 'data' du ModelView en JSON
+                ModelView modelView = (ModelView) result;
+                HashMap<String, Object> data = modelView.getData();
+                String json = new Gson().toJson(data);
+                out.print(json);
+            } else {
+                // Transformer directement le résultat en JSON
+                String json = new Gson().toJson(result);
+                out.print(json);
+            }
+        } else {
             if (result instanceof ModelView) {
                 ModelView modelView = (ModelView) result;
                 String viewUrl = modelView.getUrl();
@@ -152,7 +165,10 @@ ArrayList<Class<?>> controllers;
             } else {
                 throw new ServletException("Le type de retour de la méthode est invalide");
             }
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+
+        } 
+    }
+    catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
 
             throw new ServletException("Erreur lors de l'exécution de la méthode", e);
         }catch (Exception e){

@@ -1,6 +1,5 @@
 package Fonction;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -18,7 +17,6 @@ import com.thoughtworks.paranamer.AdaptiveParanamer;
 import com.thoughtworks.paranamer.Paranamer;
 
 import Annotation.Parametre;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -65,7 +63,6 @@ public class ListClasse {
     }
     // Argument de type non objet
     public static ArrayList<Object> ParameterMethod(Method method, HttpServletRequest request) throws Exception {
-
         ArrayList<Object> parameterValues = new ArrayList<>();
         Paranamer paranamer = new AdaptiveParanamer();
         String[] parameterNamesArray = paranamer.lookupParameterNames(method, false);
@@ -73,12 +70,10 @@ public class ListClasse {
         // Récupérer les noms des paramètres de la méthode en utilisant la réflexion
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
-
             Parameter param = parameters[i];
             String value = null;
             if (param.isAnnotationPresent(Parametre.class)) {
                 Parametre argument = param.getAnnotation(Parametre.class);
-
                 String arg_name = argument.value();
                 value = request.getParameter(arg_name);
             } else {
@@ -97,7 +92,6 @@ public class ListClasse {
                 }
             }
             if (value == null) {
-
                 throw new IllegalArgumentException("Paramètre manquant ou invalide: " + param.getName());
             }
             parameterValues.add(value);
@@ -157,7 +151,6 @@ public class ListClasse {
         } else {
             return value;
         }
-
     }
 
     
@@ -233,7 +226,6 @@ public class ListClasse {
                         }
                     }
                     if (!found) {
-
                         throw new Exception("ETU2465 : tsisy annotation");
 
                     }
@@ -244,7 +236,6 @@ public class ListClasse {
                 parameterValues.add(value);
             }
         }
-
         return parameterValues;
     }
 }
