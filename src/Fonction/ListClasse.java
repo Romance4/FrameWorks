@@ -152,6 +152,7 @@ public class ListClasse {
             return value;
         }
     }
+
     
     public static ArrayList<Object> getParameterValuesForMethod(Method method, HttpServletRequest request) throws Exception {
         ArrayList<Object> parameterValues = new ArrayList<>();
@@ -185,6 +186,7 @@ public class ListClasse {
             parameterValues.add(mySession);
     
             }else if (!paramType.isPrimitive() && paramType != String.class) {
+
                 Object paramObject = paramType.newInstance();
     
                 Map<String, String[]> parameterMap = request.getParameterMap().entrySet().stream()
@@ -225,6 +227,7 @@ public class ListClasse {
                     }
                     if (!found) {
                         throw new Exception("ETU2465 : tsisy annotation");
+
                     }
                 }
                 if (value == null) {
