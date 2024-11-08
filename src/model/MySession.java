@@ -1,4 +1,4 @@
-package Fonction;
+package p16.model;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -25,5 +25,4 @@ public class MySession {
     public void deleteAll(){
         session.invalidate();
     }
-
 }
