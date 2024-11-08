@@ -1,8 +1,9 @@
 package Annotation;
 
-import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Retention;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Get {
+public @interface Annotation {
+    String value();
 }

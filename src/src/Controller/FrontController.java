@@ -17,6 +17,7 @@ import Fonction.ListClasse;
 import Fonction.Mapping;
 import Fonction.ModelView;
 import Fonction.VerbAction;
+import SprintException.ExceptionVerb;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -127,13 +128,13 @@ ArrayList<Class<?>> controllers;
         String url = req.getServletPath();
         PrintWriter out = resp.getWriter();
         String requestedVerb = req.getMethod();
+        PrintWriter aff= resp.getWriter();
         // VerbAction verb = new VerbAction(url, requestedVerb);
         Mapping mapping = urlMappings.get(url);
         if (mapping == null) {
-            resp.setContentType("text/html");
-            // out.println(mapping.getMethodName());
-            out.println("<h2>Erreur: L'URL demandée n'est pas disponible!</h2>");
-            return;
+           String error = "404 Not found: URL indisponible hihi";
+           aff.println(error);
+           resp.sendError(HttpServletResponse.SC_NOT_FOUND,error);
         }
         VerbAction verbAction = null;
         for(VerbAction va : mapping.getVerbAction()){
@@ -143,9 +144,9 @@ ArrayList<Class<?>> controllers;
             }
         }
         if(verbAction == null) {
-            resp.setContentType("text/html");
-            // out.println(mapping.getMethodName());
-            out.println("<h2>Erreur: Le verbe " + requestedVerb + " n'est pas supporté pour cette URL.</h2>");
+            String error = "Erreur le verbe" +requestedVerb+"n'est pas disponible";
+            aff.println(error);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND,error);
             return;
         }
         String controllerName = mapping.getClassName();
@@ -222,6 +223,8 @@ ArrayList<Class<?>> controllers;
                 throw new ServletException("Le type de retour de la méthode est invalide");
             }
         } 
+    }catch(ExceptionVerb e){
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND,e.getLocalizedMessage());
     }
     catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new ServletException("Erreur lors de l'exécution de la méthode", e);
