@@ -13,6 +13,7 @@ import Annotation.Get;
 import Annotation.Post;
 import Annotation.RestAPI;
 import Annotation.Url;
+
 import Fonction.ListClasse;
 import Fonction.Mapping;
 import Fonction.ModelView;
@@ -50,11 +51,13 @@ ArrayList<Class<?>> controllers;
     
         try {
             this.setControllers(ListClasse.getAllClasses(packageName));
+
             for (Class<?> controller : this.getControllers()) {
                 for (Method method : controller.getDeclaredMethods()) {
                     if(method.isAnnotationPresent(Url.class)){
                         String className = controller.getName();
                         String methodName = method.getName();
+
                         // Get verb= method.getAnnotation(Get.class);
                         // VerbAction verb =new VerbAction(url, "GET" );
                         String verb = "GET";
@@ -93,6 +96,7 @@ ArrayList<Class<?>> controllers;
                                 throw new Exception("Erreur: L'URL " + url + " avec le verbe " + verb + " est déjà utilisée");
                             }
                         }
+
                         }
                 }
             }
@@ -150,6 +154,7 @@ ArrayList<Class<?>> controllers;
         }
         String controllerName = mapping.getClassName();
         String methodName = verbAction.geMethod();
+
 
         try {
             Class<?> controllerClass = Class.forName(controllerName);
