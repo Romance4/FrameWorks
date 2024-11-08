@@ -13,7 +13,6 @@ public class Mapping {
     }
     public Mapping(String className) {
         this.className = className;
-
     }
     public List<VerbAction> getVerbAction() {
         return verbAction;

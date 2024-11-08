@@ -1,9 +1,9 @@
 package Annotation;
 
-import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Retention;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RestAPI {
-
+public @interface Annotation {
+    String value();
 }
